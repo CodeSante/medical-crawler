@@ -3,14 +3,17 @@ from unidecode import unidecode
 from urllib.parse import urlparse
 
 allowed_urls = [
-    #"www.vidal.fr"
-    "forum.doctissimo.fr"
+    "vidal.fr"
+]
+
+blacklist_keywords = [
+    "forum"
 ]
 
 class MySpider(scrapy.Spider):
     name = "myspider"
     start_urls = [
-        "https://forum.doctissimo.fr"
+            "https://www.vidal.fr/"
     ]
     visited_urls = []
 
@@ -36,10 +39,17 @@ class MySpider(scrapy.Spider):
             return
         self.visited_urls.append(response.url)
 
+
         title = response.css("title::text").extract_first()
         title_ascii = unidecode(title)
         description = response.css("meta[name='description']::attr(content)").extract_first()
         description_ascii = unidecode(description)
+
+        blacklist_keywords_title = self.match_blacklist_keywords(title_ascii)
+        blacklist_keywords_description = self.match_blacklist_keywords(description_ascii)
+        if len(blacklist_keywords_title) > 0 or len(blacklist_keywords_description) > 0:
+            return
+
         keywords_title = self.match_keywords(title_ascii)
         keywords_description = self.match_keywords(description_ascii)
 
@@ -99,9 +109,21 @@ class MySpider(scrapy.Spider):
 
     def match_keywords(self, text):
         keywords_match = []
+        clean_text = self.clean_string(text)
+        clean_text_split = clean_text.split(' ')
         if text is None:
             return []
         for keyword in self.keywords:
+            for word in clean_text_split:
+                if keyword == word:
+                    keywords_match.append(keyword)
+        return keywords_match
+
+    def match_blacklist_keywords(self, text):
+        keywords_match = []
+        if text is None:
+            return []
+        for keyword in blacklist_keywords:
             if keyword in self.clean_string(text) and len(keyword) > 3:
                 keywords_match.append(keyword)
         return keywords_match
