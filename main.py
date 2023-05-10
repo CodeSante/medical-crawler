@@ -11,7 +11,7 @@ blacklist_keywords = [
 ]
 
 class MySpider(scrapy.Spider):
-    name = "myspider"
+    name = "test"
     start_urls = [
             "https://www.vidal.fr/"
     ]
@@ -33,17 +33,19 @@ class MySpider(scrapy.Spider):
         parsed_url = urlparse(url)
         return parsed_url.netloc.endswith(".fr")
 
-
     def parse(self, response):
         if response.url in self.visited_urls or not self.is_french_website(response.url):
             return
         self.visited_urls.append(response.url)
 
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
 
         title = response.css("title::text").extract_first()
         title_ascii = unidecode(title)
         description = response.css("meta[name='description']::attr(content)").extract_first()
         description_ascii = unidecode(description)
+        h = response.css("h1::text, h2::text").getall()
+        p = response.css("p::text").getall()
 
         blacklist_keywords_title = self.match_blacklist_keywords(title_ascii)
         blacklist_keywords_description = self.match_blacklist_keywords(description_ascii)
@@ -52,6 +54,8 @@ class MySpider(scrapy.Spider):
 
         keywords_title = self.match_keywords(title_ascii)
         keywords_description = self.match_keywords(description_ascii)
+        keywords_h = self.match_keywords_array_unidecode(h)
+        keywords_p = self.match_keywords_array_unidecode(p)
 
         try:
             if len(keywords_title) > 0 or len(keywords_description) > 0:
@@ -60,7 +64,9 @@ class MySpider(scrapy.Spider):
                     "title": title_ascii,
                     "description": description_ascii,
                     "keywords_title": keywords_title,
-                    "keywords_description": keywords_description
+                    "keywords_description": keywords_description,
+                    "keywords_h": keywords_h,
+                    "keywords_p": keywords_p,
                 }
         except:
             self.logger.warning("Ignored for URL: %s", response.url)
@@ -74,7 +80,7 @@ class MySpider(scrapy.Spider):
             # On vérifie si le lien est allowed
             if link not in self.start_urls and link not in self.visited_urls and self.match_patterns(allowed_urls, link):
                 # On envoie une requête à chaque lien dans la pile
-                yield scrapy.Request(link, callback=self.parse)
+                yield scrapy.Request(link, callback=self.parse, headers=headers)
 
     def clean_string(self, s):
         """
@@ -106,6 +112,17 @@ class MySpider(scrapy.Spider):
         s = s.lower()
 
         return s
+
+    def match_keywords_array_unidecode(self, array_text):
+        keywords_match_array = []
+
+        if array_text is None:
+            return []
+        for text in array_text:
+            text_unidecode = unidecode(text)
+            keywords = self.match_keywords(text_unidecode)
+            keywords_match_array = keywords_match_array + keywords
+        return keywords_match_array
 
     def match_keywords(self, text):
         keywords_match = []
