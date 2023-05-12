@@ -139,7 +139,7 @@ class MySpider(scrapy.Spider):
             'i': 'ìíîï',
             'n': 'ñ',
             'o': 'òóôõö',
-            'u': 'ùúûü',
+            'u': 'úûü', # Revoir pour le ou le u
             'y': 'ýÿ',
         }
         for k, v in accents.items():
@@ -147,7 +147,7 @@ class MySpider(scrapy.Spider):
                 s = s.replace(accent, k)
 
         # Replace "oe" with "Œ"
-        s = s.replace('oe', 'Œ')
+        s = s.replace('Œ', 'oe')
 
         # Convert to lowercase
         s = s.lower()
