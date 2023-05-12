@@ -15,9 +15,9 @@ blacklist_keywords = [
 class MySpider(scrapy.Spider):
     name = "Robot Code Sante - BETA"
     custom_settings = {
-        'CONCURRENT_REQUESTS': 10,  # Limite le nombre de requêtes simultanées à 1
-        'DOWNLOAD_DELAY': 0.5,  # Délai d'attente de 1 seconde entre chaque requête
-        'AUTOTHROTTLE_START_DELAY': 0.5,  # Délai initial d'attente de 1 seconde
+        'CONCURRENT_REQUESTS': 10,  # Limite le nombre de requêtes simultanées à 10
+        'DOWNLOAD_DELAY': 0.5,  # Délai d'attente de 0.5 seconde entre chaque requête
+        'AUTOTHROTTLE_START_DELAY': 0.5,  # Délai initial d'attente de 0.5 seconde
         'HTTPCACHE_ENABLED': True,  # Active la mise en cache des réponses HTTP
         'HTTPCACHE_EXPIRATION_SECS': 86400,  # Expiration du cache après 24 heures (en secondes)
         'HTTPCACHE_DIR': 'httpcache',  # Répertoire de stockage du cache
