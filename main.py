@@ -67,6 +67,11 @@ class MySpider(scrapy.Spider):
         for element in soup.recursiveChildGenerator():
             if element.name in ['title', 'h1', 'h2', 'p']:
                 elements.append((element.name, element.text.strip()))
+            elif element.name == 'img':
+                #alt_text = element.get('alt', '')
+                src_text = element.get('src', '')
+                elements.append(('img', src_text))
+                #, alt_text.strip()
         
         return elements
 
@@ -141,6 +146,7 @@ class MySpider(scrapy.Spider):
             'o': 'òóôõö',
             'u': 'úûü', # Revoir pour le ou le u
             'y': 'ýÿ',
+            ' ': '-_+/.,!?@#$%&()=\t'
         }
         for k, v in accents.items():
             for accent in v:
@@ -172,12 +178,21 @@ class MySpider(scrapy.Spider):
             if len(element) > 1:
                 text = element[1]
                 text_unidecode = unidecode(text)
+
                 keywords = self.match_keywords(text_unidecode)
+
                 interrogative_adverbs = self.match_interrogative_adverbs(text_unidecode)
                 if keywords:
                     element_keywords = [element[0], keywords]
+
+                    # Interrogative adverbs
                     if interrogative_adverbs:
                         element_keywords.append(interrogative_adverbs)
+
+                    # img src
+                    if element[0] == 'img':
+                        element_keywords.append(element[1])
+
                     dom.append(element_keywords)
         return dom
 
@@ -192,6 +207,20 @@ class MySpider(scrapy.Spider):
             for word in clean_text_split:
                 if keyword == word:
                     keywords_match.append(keyword)
+        if len(keywords_match) == 0:
+            return None
+        keywords_dir = self.keywords_to_count_dir(keywords_match)
+        return keywords_dir
+    
+    def match_keywords_pathname(self, pathname):
+        if pathname is None:
+            return []
+        
+        keywords_match = []
+        clean_pathname = self.clean_string(pathname)
+        for keyword in self.keywords:
+            if keyword in clean_pathname:
+                keywords_match.append(keyword)
         if len(keywords_match) == 0:
             return None
         keywords_dir = self.keywords_to_count_dir(keywords_match)
