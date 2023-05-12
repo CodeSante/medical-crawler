@@ -1,3 +1,4 @@
+import time
 from bs4 import BeautifulSoup
 import scrapy
 from unidecode import unidecode
@@ -21,6 +22,14 @@ class MySpider(scrapy.Spider):
         'HTTPCACHE_EXPIRATION_SECS': 86400,  # Expiration du cache après 24 heures (en secondes)
         'HTTPCACHE_DIR': 'httpcache',  # Répertoire de stockage du cache
         'HTTPCACHE_IGNORE_HTTP_CODES': [301, 302, 403, 404, 503],  # Codes HTTP à ignorer dans le cache
+        'DEPTH_LIMIT': 3,  # Limite de profondeur de crawl
+        'DEPTH_PRIORITY': 1,  # Priorité de profondeur (1 pour le crawl en largeur)
+        'SCHEDULER_DISK_QUEUE': 'scrapy.squeues.PickleFifoDiskQueue',  # File d'attente disque pour les requêtes
+        'SCHEDULER_MEMORY_QUEUE': 'scrapy.squeues.FifoMemoryQueue',  # File d'attente mémoire pour les requêtes
+        'MEDIA_ALLOW_REDIRECTS': False,  # Désactiver les redirections pour les médias
+        'MEDIA_PIPELINE': None,  # Désactiver le pipeline de traitement des médias
+        'RETRY_TIMES': 3,  # Nombre de tentatives de rééssayage des requêtes en échec
+        'RETRY_HTTP_CODES': [500, 502, 503, 504, 400, 408]
     }
     start_urls = [
             "https://www.vidal.fr/"
@@ -95,6 +104,7 @@ class MySpider(scrapy.Spider):
         try:
             yield {
                 "url": response.url,
+                "date": time.time(),
                 "title": title_ascii,
                 "description": description_ascii,
                 "dom": dom
