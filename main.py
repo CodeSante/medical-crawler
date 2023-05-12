@@ -1,3 +1,4 @@
+from bs4 import BeautifulSoup
 import scrapy
 from unidecode import unidecode
 from urllib.parse import urlparse
@@ -11,7 +12,16 @@ blacklist_keywords = [
 ]
 
 class MySpider(scrapy.Spider):
-    name = "test"
+    name = "Robot Code Sante - BETA"
+    custom_settings = {
+        'CONCURRENT_REQUESTS': 10,  # Limite le nombre de requêtes simultanées à 1
+        'DOWNLOAD_DELAY': 0.5,  # Délai d'attente de 1 seconde entre chaque requête
+        'AUTOTHROTTLE_START_DELAY': 0.5,  # Délai initial d'attente de 1 seconde
+        'HTTPCACHE_ENABLED': True,  # Active la mise en cache des réponses HTTP
+        'HTTPCACHE_EXPIRATION_SECS': 86400,  # Expiration du cache après 24 heures (en secondes)
+        'HTTPCACHE_DIR': 'httpcache',  # Répertoire de stockage du cache
+        'HTTPCACHE_IGNORE_HTTP_CODES': [301, 302, 403, 404, 503],  # Codes HTTP à ignorer dans le cache
+    }
     start_urls = [
             "https://www.vidal.fr/"
     ]
@@ -22,6 +32,10 @@ class MySpider(scrapy.Spider):
         with open("keywords.txt") as f:
             for line in f:
                 self.keywords.add(self.clean_string(line.strip()))
+        self.interrogative_adverbs = set()
+        with open("interrogative_adverbs.txt") as f:
+            for line in f:
+                self.interrogative_adverbs.add(self.clean_string(line.strip()))
 
     def match_patterns(self, patterns, text):
         for pattern in patterns:
@@ -32,42 +46,59 @@ class MySpider(scrapy.Spider):
     def is_french_website(self, url):
         parsed_url = urlparse(url)
         return parsed_url.netloc.endswith(".fr")
+    
+    def get_text_dom(self, html):
+        soup = BeautifulSoup(html, 'html.parser')
+        elements = []
+        meta_description = soup.find('meta', attrs={'name': 'description'})
+        if meta_description:
+            description = meta_description.get('content')
+            elements.append(('description', description.strip()))
+        
+        for element in soup.recursiveChildGenerator():
+            if element.name in ['title', 'h1', 'h2', 'p']:
+                elements.append((element.name, element.text.strip()))
+        
+        return elements
 
     def parse(self, response):
+
+        # Verify is not visited and is french website
         if response.url in self.visited_urls or not self.is_french_website(response.url):
             return
+        
+        # Add visited url
         self.visited_urls.append(response.url)
 
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+        # Header
+        headers = {
+            'User-Agent': 'Robot Code Sante - BETA (Linux; Ubuntu 22.04)',
+            'Accept-Language': 'fr-FR'
+        }
+
+        # Get HTML
+        html = response.body
+        text_dom = self.get_text_dom(html)
 
         title = response.css("title::text").extract_first()
         title_ascii = unidecode(title)
         description = response.css("meta[name='description']::attr(content)").extract_first()
         description_ascii = unidecode(description)
-        h = response.css("h1::text, h2::text").getall()
-        p = response.css("p::text").getall()
 
         blacklist_keywords_title = self.match_blacklist_keywords(title_ascii)
         blacklist_keywords_description = self.match_blacklist_keywords(description_ascii)
         if len(blacklist_keywords_title) > 0 or len(blacklist_keywords_description) > 0:
             return
-
-        keywords_title = self.match_keywords(title_ascii)
-        keywords_description = self.match_keywords(description_ascii)
-        keywords_h = self.match_keywords_array_unidecode(h)
-        keywords_p = self.match_keywords_array_unidecode(p)
+        
+        dom = self.match_keywords_dom(text_dom)
 
         try:
-            if len(keywords_title) > 0 or len(keywords_description) > 0:
-                yield {
-                    "url": response.url,
-                    "title": title_ascii,
-                    "description": description_ascii,
-                    "keywords_title": keywords_title,
-                    "keywords_description": keywords_description,
-                    "keywords_h": keywords_h,
-                    "keywords_p": keywords_p,
-                }
+            yield {
+                "url": response.url,
+                "title": title_ascii,
+                "description": description_ascii,
+                "dom": dom
+            }
         except:
             self.logger.warning("Ignored for URL: %s", response.url)
 
@@ -112,29 +143,65 @@ class MySpider(scrapy.Spider):
         s = s.lower()
 
         return s
+    
+    def keywords_to_count_dir(self, keywords):
+        keyword_counts = {}
+        for keyword in keywords:
+            if keyword in keyword_counts:
+                keyword_counts[keyword] += 1
+            else:
+                keyword_counts[keyword] = 1
+        return keyword_counts
 
-    def match_keywords_array_unidecode(self, array_text):
-        keywords_match_array = []
+    def match_keywords_dom(self, text_dom):
+        dom = []
 
-        if array_text is None:
+        if text_dom is None:
             return []
-        for text in array_text:
-            text_unidecode = unidecode(text)
-            keywords = self.match_keywords(text_unidecode)
-            keywords_match_array = keywords_match_array + keywords
-        return keywords_match_array
+        for element in text_dom:
+            if len(element) > 1:
+                text = element[1]
+                text_unidecode = unidecode(text)
+                keywords = self.match_keywords(text_unidecode)
+                interrogative_adverbs = self.match_interrogative_adverbs(text_unidecode)
+                if keywords:
+                    element_keywords = [element[0], keywords]
+                    if interrogative_adverbs:
+                        element_keywords.append(interrogative_adverbs)
+                    dom.append(element_keywords)
+        return dom
 
     def match_keywords(self, text):
+        if text is None:
+            return []
+        
         keywords_match = []
         clean_text = self.clean_string(text)
         clean_text_split = clean_text.split(' ')
-        if text is None:
-            return []
         for keyword in self.keywords:
             for word in clean_text_split:
                 if keyword == word:
                     keywords_match.append(keyword)
-        return keywords_match
+        if len(keywords_match) == 0:
+            return None
+        keywords_dir = self.keywords_to_count_dir(keywords_match)
+        return keywords_dir
+    
+    def match_interrogative_adverbs(self, text):
+        if text is None:
+            return None
+        
+        interrogative_adverbs_match = []
+        clean_text = self.clean_string(text)
+        clean_text_split = clean_text.split(' ')
+        for interrogative_adverb in self.interrogative_adverbs:
+            for word in clean_text_split:
+                if interrogative_adverb == word:
+                    interrogative_adverbs_match.append(interrogative_adverb)
+        if len(interrogative_adverbs_match) == 0:
+            return None
+        interrogative_adverbs_dir = self.keywords_to_count_dir(interrogative_adverbs_match)
+        return interrogative_adverbs_dir
 
     def match_blacklist_keywords(self, text):
         keywords_match = []
