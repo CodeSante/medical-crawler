@@ -22,12 +22,12 @@ dom
 
 - Ajouter scrapping video :
 	- src
-	
+
 
 - Ecrire en BDD (Postgresql / mixe JSON)
 
 urls:
-id, url, dom-id, dom-hash
+id, url, dom-id
 
 doms:
 id, dom-json, url-id

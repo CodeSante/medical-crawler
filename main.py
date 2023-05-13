@@ -3,6 +3,9 @@ from bs4 import BeautifulSoup
 import scrapy
 from unidecode import unidecode
 from urllib.parse import urlparse
+import psycopg2
+import json
+import signal
 
 allowed_urls = [
     "vidal.fr"
@@ -11,6 +14,24 @@ allowed_urls = [
 blacklist_keywords = [
     "forum"
 ]
+
+# Database
+db_host = "localhost"
+db_port = "5432"
+db_name = "medical-crawler"
+db_user = "crawler"
+db_password = "bG9jYWxob3N0"
+conn = psycopg2.connect(host=db_host, port=db_port, database=db_name, user=db_user, password=db_password)
+cur = conn.cursor()
+
+# Signals
+signal.signal(signal.SIGINT, self.handle_signal)
+signal.signal(signal.SIGTERM, self.handle_signal)
+
+def handle_signal(self, signum, frame):
+    should_stop = True
+    cur.close()
+    conn.close()
 
 class MySpider(scrapy.Spider):
     name = "Robot Code Sante - BETA"
@@ -37,6 +58,7 @@ class MySpider(scrapy.Spider):
     visited_urls = []
 
     def __init__(self):
+
         self.keywords = set()
         with open("keywords.txt") as f:
             for line in f:
@@ -116,6 +138,12 @@ class MySpider(scrapy.Spider):
             }
         except:
             self.logger.warning("Ignored for URL: %s", response.url)
+
+        # Insert database
+        cur.execute("INSERT INTO urls (url) VALUES (%s) RETURNING id", (response.url,))
+        url_id = cur.fetchone()[0]
+        cur.execute("INSERT INTO doms (dom_json, url_id) VALUES (%s, %s)", (json.dumps(dom), url_id))
+        conn.commit()
 
         # On récupère tous les liens de la page et on les stocke dans la pile
         links = response.css("a::attr(href)").extract()
