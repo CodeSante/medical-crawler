@@ -62,6 +62,33 @@ def get_urls_without_dom():
     except (Exception, psycopg2.Error) as error:
         print("Erreur lors de la connexion à PostgreSQL :", error)
         return jsonify({'error': 'Erreur lors de la connexion à la base de données'})
+    
+@app.route('/urls/pages_nb', methods=['GET'])
+def get_urls_pages_nb():
+    try:
+        # Connexion à la base de données
+        conn = psycopg2.connect(host=db_host, port=db_port, database=db_name, user=db_user, password=db_password)
+        cursor = conn.cursor()
+
+        # Récupération des URLs et des champs "dom" à partir de la table "urls"
+        cursor.execute("SELECT url FROM urls")
+        rows = cursor.fetchall()
+
+        # Fermeture de la connexion à la base de données
+        cursor.close()
+        conn.close()
+
+        # Conversion des résultats en une liste de dictionnaires
+        urls_list = []
+        for row in rows:
+            urls_list.append({'url': row[0]})
+
+        # Retourne les URLs sous forme de JSON
+        return jsonify({'pages_nb': len(urls_list)})
+
+    except (Exception, psycopg2.Error) as error:
+        print("Erreur lors de la connexion à PostgreSQL :", error)
+        return jsonify({'error': 'Erreur lors de la connexion à la base de données'})
 
 if __name__ == '__main__':
     app.run(debug=True)
