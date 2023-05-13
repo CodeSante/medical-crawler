@@ -10,11 +10,19 @@ Before starting the project, make sure you have the following components install
 
 - Python 3.x
 - PostgreSQL
-- Scrapy
-- BeautifulSoup
-- unidecode
+- pyenv
 
-You need to run the _install.sh_ script to download the keywords and execute the _scripts/install-db.sh_ script to install the database.
+### Install
+
+```bash
+pip3 install scrapy
+pip3 install beautifulsoup4
+pip3 install unidecode
+pip3 install psycopg2
+pip3 install flask
+bash install.sh
+sudo bash scripts/install-db.sh
+```
 
 ## Usage
 
