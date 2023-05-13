@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from datetime import datetime
 import psycopg2
 
 app = Flask(__name__)
@@ -18,7 +19,7 @@ def get_urls():
         cursor = conn.cursor()
 
         # Récupération des URLs et des champs "dom" à partir de la table "urls"
-        cursor.execute("SELECT url, dom, turn FROM urls")
+        cursor.execute("SELECT url, dom, turn, turn_time FROM urls")
         rows = cursor.fetchall()
 
         # Fermeture de la connexion à la base de données
@@ -26,7 +27,7 @@ def get_urls():
         conn.close()
 
         # Conversion des résultats en une liste de dictionnaires
-        urls_list = [{'url': row[0], 'dom': row[1], 'turn': row[2]} for row in rows]
+        urls_list = [{'url': row[0], 'dom': row[1], 'turn': row[2], 'turn_time': row[3]} for row in rows]
 
         # Retourne les URLs sous forme de JSON
         return jsonify(urls_list)
@@ -43,7 +44,7 @@ def get_urls_without_dom():
         cursor = conn.cursor()
 
         # Récupération des URLs et des champs "dom" à partir de la table "urls"
-        cursor.execute("SELECT url, turn FROM urls")
+        cursor.execute("SELECT url, turn, turn_time FROM urls")
         rows = cursor.fetchall()
 
         # Fermeture de la connexion à la base de données
@@ -51,7 +52,9 @@ def get_urls_without_dom():
         conn.close()
 
         # Conversion des résultats en une liste de dictionnaires
-        urls_list = [{'url': row[0], 'turn': row[1]} for row in rows]
+        urls_list = []
+        for row in rows:
+            urls_list.append({'url': row[0], 'turn': row[1], 'turn_time': row[2]})
 
         # Retourne les URLs sous forme de JSON
         return jsonify({'pages_nb': len(urls_list), 'urls': urls_list})

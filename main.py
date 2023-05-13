@@ -1,3 +1,4 @@
+import datetime
 import time
 from bs4 import BeautifulSoup
 import scrapy
@@ -147,10 +148,10 @@ class MySpider(scrapy.Spider):
 
         # Insert database
         cur.execute("""
-            INSERT INTO urls (url, dom, turn)
-            VALUES (%s, %s, 1)
+            INSERT INTO urls (url, dom, turn, turn_time)
+            VALUES (%s, %s, 1, CURRENT_TIMESTAMP)
             ON CONFLICT (url)
-            DO UPDATE SET dom = EXCLUDED.dom, turn = urls.turn + 1
+            DO UPDATE SET dom = EXCLUDED.dom, turn = urls.turn + 1, turn_time = CURRENT_TIMESTAMP
             WHERE urls.url = %s
         """, (response.url, json.dumps(dom), response.url))
         conn.commit()
@@ -169,7 +170,7 @@ class MySpider(scrapy.Spider):
     def clean_string(self, s):
         """
         Trims a string, removes accents, converts to lowercase,
-        and replaces "oe" with "Œ".
+        and replaces "Œ" with "oe".
         """
         # Remove leading/trailing whitespace
         s = s.strip()

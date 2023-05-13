@@ -9,7 +9,7 @@ db_password="bG9jYWxob3N0"
 # Create Database and Tables
 
 create_db_sql="CREATE DATABASE $db_name;"
-create_urls_table_sql="CREATE TABLE IF NOT EXISTS urls (id SERIAL PRIMARY KEY, url VARCHAR(2084) UNIQUE, dom JSONB, turn INTEGER DEFAULT 1);"
+create_urls_table_sql="CREATE TABLE IF NOT EXISTS urls (id SERIAL PRIMARY KEY, url VARCHAR(2084) UNIQUE, dom JSONB, turn INTEGER DEFAULT 1, turn_time TIMESTAMP DEFAULT NOW());"
 
 echo "Creating database: $db_name"
 sudo -u postgres psql -c "$create_db_sql" 2>/dev/null || echo "Database $db_name already exists"
