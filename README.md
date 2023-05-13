@@ -1,10 +1,10 @@
 # Medical Crawler
 
-Medical Crawler is a web crawling project specifically designed for medical websites. It is developed using the Scrapy framework and utilizes a PostgreSQL database. The crawler is capable of gathering various information from web pages, including URLs, titles, descriptions, and specific text elements. It employs filtering mechanisms to exclude irrelevant sites from the crawl.
+Medical Crawler is an ongoing web crawling project specifically designed for medical websites. Currently, it is being tested exclusively on the site vidal.fr. The project is developed using the Scrapy framework and utilizes a PostgreSQL database. The crawler is capable of gathering various information from web pages, including URLs, titles, descriptions, and specific text elements. It employs filtering mechanisms to exclude irrelevant sites from the crawl.
 
 The search functionality of Medical Crawler relies on a keyword-based approach, incorporating a spell-checking feature using the "medical-wordlist" project. This enables accurate matching and retrieval of relevant medical content during the crawling process.
 
-The crawling is specifically targeted towards French websites, with the intention of creating a search engine for medical information in the field of medicine in the French language.
+In the future, the project aims to expand its reach and add a total of 320 medical websites to its crawling capabilities. This will enable the search engine to provide comprehensive medical information from a wide range of trusted sources. Please note that the project is currently under development, and these additions are planned for future implementation.
 
 ## Prerequisites
 
