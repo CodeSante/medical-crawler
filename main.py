@@ -140,9 +140,7 @@ class MySpider(scrapy.Spider):
             self.logger.warning("Ignored for URL: %s", response.url)
 
         # Insert database
-        cur.execute("INSERT INTO urls (url) VALUES (%s) RETURNING id", (response.url,))
-        url_id = cur.fetchone()[0]
-        cur.execute("INSERT INTO doms (dom_json, url_id) VALUES (%s, %s)", (json.dumps(dom), url_id))
+        cur.execute("INSERT INTO urls (url, dom) VALUES (%s, %s) RETURNING id", (response.url, json.dumps(dom)))
         conn.commit()
 
         # On récupère tous les liens de la page et on les stocke dans la pile

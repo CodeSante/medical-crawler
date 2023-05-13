@@ -27,10 +27,7 @@ dom
 - Ecrire en BDD (Postgresql / mixe JSON)
 
 urls:
-id, url, dom-id
-
-doms:
-id, dom-json, url-id
+id, url, dom
 
 - Detecter les pages souvent mises a jour via un hash et un iter
 

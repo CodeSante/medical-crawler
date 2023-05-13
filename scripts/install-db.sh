@@ -9,17 +9,13 @@ db_password="bG9jYWxob3N0"
 # Create Database and Tables
 
 create_db_sql="CREATE DATABASE $db_name;"
-create_urls_table_sql="CREATE TABLE IF NOT EXISTS urls (id SERIAL PRIMARY KEY, url TEXT, dom_id INTEGER);"
-create_doms_table_sql="CREATE TABLE IF NOT EXISTS doms (id SERIAL PRIMARY KEY, dom_json JSONB, url_id INTEGER);"
+create_urls_table_sql="CREATE TABLE IF NOT EXISTS urls (id SERIAL PRIMARY KEY, url TEXT, dom JSONB);"
 
 echo "Creating database: $db_name"
 sudo -u postgres psql -c "$create_db_sql" 2>/dev/null || echo "Database $db_name already exists"
 echo
 echo "Creating urls table"
 sudo -u postgres psql -d $db_name -c "$create_urls_table_sql" 2>/dev/null || echo "Table urls already exists"
-echo
-echo "Creating doms table"
-sudo -u postgres psql -d $db_name -c "$create_doms_table_sql" 2>/dev/null || echo "Table doms already exists"
 
 # Create User Crawler
 
@@ -35,8 +31,8 @@ echo
 # Grant Permissions to User Crawler
 
 grant_permissions_sql="GRANT ALL PRIVILEGES ON DATABASE $db_name TO $db_user;"
-grant_table_permissions_sql="GRANT ALL PRIVILEGES ON TABLE urls, doms TO $db_user;"
-grant_sequence_permissions_sql="GRANT USAGE, SELECT, UPDATE ON SEQUENCE urls_id_seq, doms_id_seq TO $db_user;"
+grant_table_permissions_sql="GRANT ALL PRIVILEGES ON TABLE urls TO $db_user;"
+grant_sequence_permissions_sql="GRANT USAGE, SELECT, UPDATE ON SEQUENCE urls_id_seq TO $db_user;"
 
 echo "Granting permissions to user: $db_user"
 sudo -u postgres psql -c "$grant_permissions_sql" 2>/dev/null || echo "Failed to grant permissions to user $db_user"
