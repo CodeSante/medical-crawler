@@ -224,4 +224,16 @@ At _http://127.0.0.1:5000/urls_
   },
 ```
 
+or
+
+```
+[
+  "img",
+  {
+    "cafeine": 1
+  },
+  "https://vidalactus.vidal.fr/files/uploads/actus/images/gencebok-cafeine-injectable.jpg"
+],
+```
+
 At _http://127.0.0.1:5000/urls/without-dom_ you can display all crawled URLs.
