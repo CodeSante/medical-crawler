@@ -67,10 +67,10 @@ class MySpider(scrapy.Spider):
         for element in soup.recursiveChildGenerator():
             if element.name in ['title', 'h1', 'h2', 'p']:
                 elements.append((element.name, element.text.strip()))
-            elif element.name == 'img':
+            elif element.name == 'img' or element.name == 'video':
                 #alt_text = element.get('alt', '')
                 src_text = element.get('src', '')
-                elements.append(('img', src_text))
+                elements.append((element.name, src_text))
                 #, alt_text.strip()
         
         return elements
