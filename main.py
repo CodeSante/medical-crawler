@@ -25,7 +25,6 @@ conn = psycopg2.connect(host=db_host, port=db_port, database=db_name, user=db_us
 cur = conn.cursor()
 
 def handle_signal(self, signum, frame):
-    should_stop = True
     cur.close()
     conn.close()
 
@@ -56,6 +55,7 @@ class MySpider(scrapy.Spider):
             "https://www.vidal.fr/"
     ]
     visited_urls = []
+    visited_urls_limit = 20000
 
     def __init__(self):
 
@@ -92,8 +92,9 @@ class MySpider(scrapy.Spider):
             elif element.name == 'img' or element.name == 'video':
                 #alt_text = element.get('alt', '')
                 src_text = element.get('src', '')
-                elements.append((element.name, src_text))
-                #, alt_text.strip()
+                if not src_text.startswith('data:'):
+                    elements.append((element.name, src_text))
+                    #, alt_text.strip()
         
         return elements
 
@@ -102,6 +103,10 @@ class MySpider(scrapy.Spider):
         # Verify is not visited and is french website
         if response.url in self.visited_urls or not self.is_french_website(response.url):
             return
+        
+        # Check if visited URLs limit exceeded
+        if len(self.visited_urls) > self.visited_urls_limit:
+            self.visited_urls = []
         
         # Add visited url
         self.visited_urls.append(response.url)
@@ -140,7 +145,13 @@ class MySpider(scrapy.Spider):
             self.logger.warning("Ignored for URL: %s", response.url)
 
         # Insert database
-        cur.execute("INSERT INTO urls (url, dom) VALUES (%s, %s) RETURNING id", (response.url, json.dumps(dom)))
+        cur.execute("""
+            INSERT INTO urls (url, dom)
+            VALUES (%s, %s)
+            ON CONFLICT (url)
+            DO UPDATE SET dom = EXCLUDED.dom
+            WHERE urls.url = %s
+        """, (response.url, json.dumps(dom), response.url))
         conn.commit()
 
         # On récupère tous les liens de la page et on les stocke dans la pile
