@@ -100,13 +100,14 @@ class MySpider(scrapy.Spider):
 
     def parse(self, response):
 
-        # Verify is not visited and is french website
-        if response.url in self.visited_urls or not self.is_french_website(response.url):
-            return
-        
         # Check if visited URLs limit exceeded
         if len(self.visited_urls) > self.visited_urls_limit:
             self.visited_urls = []
+
+        # Verify is not visited and is french website
+        if response.url in self.visited_urls or not self.is_french_website(response.url):
+            self.visited_urls.append(response.url)
+            return
         
         # Add visited url
         self.visited_urls.append(response.url)
