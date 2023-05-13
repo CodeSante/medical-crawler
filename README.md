@@ -1,10 +1,12 @@
 # Medical Crawler
 
-Medical Crawler est un projet de crawl de sites web médicaux développé en utilisant le framework Scrapy et la base de données PostgreSQL. Il permet de collecter des informations à partir des pages web, telles que les URL, les titres, les descriptions et les éléments de texte spécifiques, tout en filtrant les sites non pertinents. La recherche s'appuie sur une liste de mots clés (spell checking) en utilisant le projet "medical-wordlist".
+Medical Crawler is a web crawling project specifically designed for medical websites. It is developed using the Scrapy framework and utilizes a PostgreSQL database. The crawler is capable of gathering various information from web pages, including URLs, titles, descriptions, and specific text elements. It employs filtering mechanisms to exclude irrelevant sites from the crawl.
 
-## Prérequis
+The search functionality of Medical Crawler relies on a keyword-based approach, incorporating a spell checking feature using the "medical-wordlist" project. This enables accurate matching and retrieval of relevant medical content during the crawling process.
 
-Avant de démarrer le projet, assurez-vous d'avoir les éléments suivants installés :
+## Prerequisites
+
+Before starting the project, make sure you have the following components installed:
 
 - Python 3.x
 - PostgreSQL
@@ -12,9 +14,9 @@ Avant de démarrer le projet, assurez-vous d'avoir les éléments suivants insta
 - BeautifulSoup
 - unidecode
 
-Il faut lancer _install.sh_ pour télécharger les mots-clefs et lancer le script _scripts/install-db.sh_ pour installer la BDD.
+You need to run the _install.sh_ script to download the keywords and execute the _scripts/install-db.sh_ script to install the database.
 
-## Utilisation
+## Usage
 
 ```bash
 python3 -m scrapy runspider main.py
