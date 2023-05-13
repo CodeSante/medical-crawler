@@ -31,3 +31,197 @@ sudo bash scripts/install-db.sh
 ```bash
 python3 -m scrapy runspider main.py
 ```
+## Demo
+
+```bash
+python3 api.py
+```
+
+At _http://127.0.0.1:5000/urls_
+
+```
+  {
+    "dom": [
+      [
+        "title",
+        {
+          "phytotherapie": 1
+        }
+      ],
+      [
+        "h1",
+        {
+          "phytotherapie": 1
+        }
+      ],
+      [
+        "p",
+        {
+          "patient": 1
+        }
+      ],
+      [
+        "p",
+        {
+          "plante": 1
+        },
+        {
+          "qui": 1
+        }
+      ],
+      [
+        "p",
+        {
+          "cholesterol": 1,
+          "diarrhees": 1
+        }
+      ],
+      [
+        "p",
+        {
+          "cholesterol": 2
+        },
+        {
+          "qui": 1
+        }
+      ],
+      [
+        "p",
+        {
+          "diarrhees": 1
+        },
+        {
+          "qui": 1
+        }
+      ],
+      [
+        "p",
+        {
+          "maladie": 2
+        },
+        {
+          "qui": 1
+        }
+      ]
+    ],
+    "url": "https://www.vidal.fr/parapharmacie/phytotherapie-plantes/germe-ble-triticum-vulgaris.html"
+  },
+  {
+    "dom": [
+      [
+        "description",
+        {
+          "constipation": 1,
+          "phytotherapie": 1
+        }
+      ],
+      [
+        "title",
+        {
+          "phytotherapie": 1
+        }
+      ],
+      [
+        "h1",
+        {
+          "phytotherapie": 1
+        }
+      ],
+      [
+        "p",
+        {
+          "patient": 1
+        }
+      ],
+      [
+        "p",
+        {
+          "bile": 1,
+          "constipation": 1,
+          "foie": 1,
+          "medicaments": 1,
+          "phytotherapie": 1
+        }
+      ],
+      [
+        "p",
+        {
+          "bile": 1,
+          "foie": 1,
+          "maladie": 1,
+          "phytotherapie": 1,
+          "plante": 1
+        }
+      ],
+      [
+        "p",
+        {
+          "medicaments": 1
+        },
+        {
+          "qui": 1
+        }
+      ],
+      [
+        "p",
+        {
+          "bile": 1
+        }
+      ],
+      [
+        "p",
+        {
+          "gastro": 1
+        }
+      ],
+      [
+        "p",
+        {
+          "gastro": 1
+        }
+      ],
+      [
+        "p",
+        {
+          "foie": 1,
+          "phytotherapie": 1,
+          "vesicule": 1
+        }
+      ],
+      [
+        "p",
+        {
+          "foie": 1,
+          "maladie": 1,
+          "medecin": 1,
+          "plante": 1
+        },
+        {
+          "qui": 3
+        }
+      ],
+      [
+        "p",
+        {
+          "anticoagulants": 1,
+          "medicaments": 1,
+          "sang": 1,
+          "warfarine": 1
+        }
+      ],
+      [
+        "p",
+        {
+          "constipation": 2,
+          "phytotherapie": 1
+        },
+        {
+          "qui": 1
+        }
+      ]
+    ],
+    "url": "https://www.vidal.fr/parapharmacie/phytotherapie-plantes/boldo-peumus-boldus.html"
+  },
+```
+
+At _http://127.0.0.1:5000/urls/without-dom_ you can display all crawled URLs.
