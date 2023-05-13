@@ -1,6 +1,6 @@
 # Medical Crawler
 
-Medical Crawler est un projet de crawl de sites web médicaux, développé en utilisant le framework Scrapy et la base de données PostgreSQL. Il permet de collecter des informations à partir des pages web, telles que les URL, les titres, les descriptions et les éléments de texte spécifiques, tout en filtrant les sites non pertinents.
+Medical Crawler est un projet de crawl de sites web médicaux développé en utilisant le framework Scrapy et la base de données PostgreSQL. Il permet de collecter des informations à partir des pages web, telles que les URL, les titres, les descriptions et les éléments de texte spécifiques, tout en filtrant les sites non pertinents. La recherche s'appuie sur une liste de mots clés (spell checking) en utilisant le projet "medical-wordlist".
 
 ## Prérequis
 
