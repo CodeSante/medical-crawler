@@ -18,20 +18,20 @@ blacklist_keywords = [
 # Database
 db_host = "localhost"
 db_port = "5432"
-db_name = "medical-crawler"
+db_name = "medical_crawler"
 db_user = "crawler"
 db_password = "bG9jYWxob3N0"
 conn = psycopg2.connect(host=db_host, port=db_port, database=db_name, user=db_user, password=db_password)
 cur = conn.cursor()
 
-# Signals
-signal.signal(signal.SIGINT, self.handle_signal)
-signal.signal(signal.SIGTERM, self.handle_signal)
-
 def handle_signal(self, signum, frame):
     should_stop = True
     cur.close()
     conn.close()
+
+# Signals
+signal.signal(signal.SIGINT, handle_signal)
+signal.signal(signal.SIGTERM, handle_signal)
 
 class MySpider(scrapy.Spider):
     name = "Robot Code Sante - BETA"
