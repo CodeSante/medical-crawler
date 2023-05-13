@@ -12,7 +12,7 @@ fi
 # Configuration de la base de données PostgreSQL
 db_host="localhost"
 db_port="5432"
-db_name="medical-crawler"
+db_name="medical_crawler"
 db_user="crawler"
 db_password="bG9jYWxob3N0"
 
