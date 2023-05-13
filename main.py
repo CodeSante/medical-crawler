@@ -147,10 +147,10 @@ class MySpider(scrapy.Spider):
 
         # Insert database
         cur.execute("""
-            INSERT INTO urls (url, dom)
-            VALUES (%s, %s)
+            INSERT INTO urls (url, dom, turn)
+            VALUES (%s, %s, 1)
             ON CONFLICT (url)
-            DO UPDATE SET dom = EXCLUDED.dom
+            DO UPDATE SET dom = EXCLUDED.dom, turn = urls.turn + 1
             WHERE urls.url = %s
         """, (response.url, json.dumps(dom), response.url))
         conn.commit()
