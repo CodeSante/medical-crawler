@@ -101,6 +101,8 @@ class MySpider(scrapy.Spider):
 
     def parse(self, response):
 
+        response = response.replace(encoding='utf-8')
+
         # Check if visited URLs limit exceeded
         if len(self.visited_urls) > self.visited_urls_limit:
             self.visited_urls = []
