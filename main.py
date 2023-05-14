@@ -152,7 +152,7 @@ class MySpider(scrapy.Spider):
             VALUES (%s, %s, 1, CURRENT_TIMESTAMP)
             ON CONFLICT (url)
             DO UPDATE SET dom = EXCLUDED.dom, turn = urls.turn + 1, turn_time = CURRENT_TIMESTAMP
-            WHERE urls.url = %s AND dom != %s
+            WHERE urls.url = %s AND urls.dom != %s
         """, (response.url, json.dumps(dom), response.url, json.dumps(dom)))
         conn.commit()
 
