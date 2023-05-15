@@ -31,6 +31,22 @@ sudo bash scripts/install-db.sh
 ```bash
 python3 -m scrapy runspider main.py
 ```
+
+### Backup
+
+Create a backup from database :
+
+```bash
+sudo -u postgres pg_dump -U crawler -h localhost -p 5432 -d medical_crawler -F c > backup
+```
+
+Restore a backup :
+
+```bash
+sudo -u postgres pg_restore -U crawler -h localhost -p 5432 -d medical_crawler -F c backup
+```
+Default password is *bG9jYWxob3N0*
+
 ## Demo
 
 ```bash
