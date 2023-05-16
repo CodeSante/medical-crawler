@@ -5,3 +5,4 @@ pip3 install bs4
 pip3 install scrapy
 pip3 install unidecode
 pip3 install psycopg2
+bash scripts/install-db.sh
