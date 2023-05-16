@@ -12,7 +12,7 @@ Before starting the project, make sure you have the following components install
 
 - Python 3.x
 - PostgreSQL
-- pyenv
+- pip3
 
 ### Install
 
