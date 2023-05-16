@@ -9,7 +9,7 @@ import json
 import signal
 
 allowed_urls = [
-    "vidal.fr"
+    "aphp.fr"
 ]
 
 blacklist_keywords = [
@@ -53,7 +53,7 @@ class MySpider(scrapy.Spider):
         'RETRY_HTTP_CODES': [500, 502, 503, 504, 400, 408]
     }
     start_urls = [
-            "https://www.vidal.fr/"
+            "https://www.aphp.fr/"
     ]
     visited_urls = []
     visited_urls_limit = 20000
