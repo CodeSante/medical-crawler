@@ -1,0 +1,4 @@
+bs4
+scrapy
+unidecode
+psycopg2
